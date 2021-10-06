@@ -1,0 +1,24 @@
+{
+  "name": "abyzs/privatcoollib",
+  "description": "",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "abyzs",
+      "email": "abyzswalker@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "PrivatCoolLib\\Exchange\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "PrivatCoolLib\\Exchange\\": "tests/"
+    }
+  },
+  "require": {
+    "ext-curl": "*"
+  }
+}
