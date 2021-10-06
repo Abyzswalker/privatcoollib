@@ -10,12 +10,12 @@
   ],
   "autoload": {
     "psr-4": {
-      "PrivatCoolLib\\Exchange\\": "src/"
+      "Abyzs\\PrivatCoolLib\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "PrivatCoolLib\\Exchange\\": "tests/"
+      "Abyzs\\PrivatCoolLib\\": "tests/"
     }
   },
   "require": {

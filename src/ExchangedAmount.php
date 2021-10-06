@@ -1,6 +1,6 @@
 <?php
 
-namespace PrivatCoolLib\Exchange;
+namespace Abyzs\PrivatCoolLib;
 
 
 class ExchangeAmount
