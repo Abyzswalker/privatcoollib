@@ -39,7 +39,7 @@ class ExchangeAmount
         return $this->RUB;
     }
 
-    public function toDecimal ($from, $to, $amount): int
+    public function toDecimal ($from, $to, $amount): float
     {
         switch ($from) {
             case "EUR":
@@ -76,12 +76,9 @@ class ExchangeAmount
                 $to_Currency = $from_Currency;
                 break;
         }
-        return $to_Currency;
+        return round($to_Currency, 3);
     }
-
 }
-
-
 
 
 
