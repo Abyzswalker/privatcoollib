@@ -9,8 +9,9 @@ class ExchangeAmount
     private $EUR;
     private $USD;
     private $RUB;
+    private $BTC;
 
-    private function curl (): array {
+    public function curl (): array {
         $curl= curl_init();
         curl_setopt_array($curl,array(
                 CURLOPT_URL => $this->url,
@@ -25,60 +26,115 @@ class ExchangeAmount
     }
 
     private function usd (): array {
-        $this->USD = $this->curl()[0];
+        $curl = $this->curl();
+        foreach ($curl as $value) {
+            if ($value['ccy'] == 'USD') {
+                $this->USD = $value;
+            }
+        };
         return $this->USD;
     }
 
     private function eur (): array {
-        $this->EUR = $this->curl()[1];
+        $curl = $this->curl();
+        foreach ($curl as $value) {
+            if ($value['ccy'] == 'EUR') {
+                $this->EUR = $value;
+            }
+        };
         return $this->EUR;
     }
 
     private function rub (): array {
-        $this->RUB = $this->curl()[2];
+        $curl = $this->curl();
+        foreach ($curl as $value) {
+            if ($value['ccy'] == 'RUR') {
+                $this->RUB = $value;
+            }
+        };
         return $this->RUB;
+    }
+
+    private function btc (): array {
+        $curl = $this->curl();
+        foreach ($curl as $value) {
+            if ($value['ccy'] == 'BTC') {
+                $this->BTC = $value;
+            }
+        };
+        return $this->BTC;
     }
 
     public function toDecimal ($from, $to, $amount): float
     {
         switch ($from) {
             case "EUR":
-                $eur = $this->eur()['sale'];
-                $from_Currency = $amount * $eur;
+                $eurSale = $this->eur()['sale'];
+                $from_Currency = $eurSale * $amount;
                 break;
             case "USD":
-                $usd = $this->usd()['sale'];
-                $from_Currency = $amount * $usd;
+                $usdSale = $this->usd()['sale'];
+                $from_Currency = $usdSale * $amount;
                 break;
             case "RUB":
-                $rub = $this->rub()['sale'];
-                $from_Currency = $amount * $rub;
+                $rubSale = $this->rub()['sale'];
+                $from_Currency = $rubSale * $amount;
                 break;
             case "UAH":
                 $from_Currency = $amount;
+                break;
+            case "BTC":
+                $btcSale = $this->btc()['sale'];
+                $from_Currency = $btcSale * $amount;
                 break;
         }
 
         switch ($to) {
             case "EUR":
-                $eur = $this->eur()['buy'];
-                $to_Currency = $from_Currency / $eur;
+                $eurBuy = $this->eur()['buy'];
+                if ($from == 'BTC') {
+                    $usdSale = $this->usd()['sale'];
+                    $uah = $from_Currency * $usdSale;
+
+                    $to_Currency = $uah / $eurBuy;
+                } else {
+                    $to_Currency = $from_Currency / $eurBuy;
+                }
                 break;
             case "USD":
-                $usd = $this->usd()['buy'];
-                $to_Currency = $from_Currency / $usd;
+                $usdBuy = $this->usd()['buy'];
+                if ($from == 'BTC') {
+                    $to_Currency = $from_Currency;
+                } else {
+                    $to_Currency = $from_Currency / $usdBuy;
+                }
                 break;
             case "RUB":
-                $rub = $this->rub()['buy'];
-                $to_Currency = $from_Currency / $rub;
+                $rubBuy = $this->rub()['buy'];
+                if ($from == 'BTC') {
+                    $usdSale = $this->usd()['sale'];
+                    $uah = $from_Currency * $usdSale;
+
+                    $to_Currency = $uah / $rubBuy;
+                } else {
+                    $to_Currency = $from_Currency / $rubBuy;
+                }
                 break;
             case "UAH":
-                $to_Currency = $from_Currency;
+                if ($from == 'BTC') {
+                    $usdSale = $this->usd()['sale'];
+                    $uah = $from_Currency * $usdSale;
+
+                    $to_Currency = $uah;
+                } else {
+                    $to_Currency = $from_Currency;
+                }
+                break;
+            case "BTC":
+                $btcBuy = $this->btc()['buy'];
+                $to_Currency = $from_Currency / $btcBuy;
                 break;
         }
         return round($to_Currency, 3);
     }
 }
-
-
-
