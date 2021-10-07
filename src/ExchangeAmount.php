@@ -11,7 +11,7 @@ class ExchangeAmount
     private $RUB;
     private $BTC;
 
-    public function curl (): array {
+    private function curl (): array {
         $curl= curl_init();
         curl_setopt_array($curl,array(
                 CURLOPT_URL => $this->url,
