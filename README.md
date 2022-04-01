@@ -1,4 +1,4 @@
-composer require abyzswalker/privatcoollib
+composer require abyzs/privatcoollib
 
 use Abyzs\PrivatCoolLib\ExchangeAmount;
 
