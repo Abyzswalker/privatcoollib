@@ -6,135 +6,55 @@ namespace Abyzs\PrivatCoolLib;
 class ExchangeAmount
 {
     private $url = 'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5';
-    private $EUR;
-    private $USD;
-    private $RUB;
-    private $BTC;
+    private $from;
+    private $to;
+    private $amount;
 
-    private function curl (): array {
-        $curl= curl_init();
-        curl_setopt_array($curl,array(
+    public function __construct($from, $to, $amount)
+    {
+        $this->from = $from;
+        $this->to = $to;
+        $this->amount = $amount;
+    }
+
+    private function curl()
+    {
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
                 CURLOPT_URL => $this->url,
                 CURLOPT_CUSTOMREQUEST => "GET",
-                CURLOPT_RETURNTRANSFER =>true,
-                CURLOPT_HTTPHEADER => array('Content-Type:application/json','X-REST-API-KEY: dce26797a38f82a6f719afa54dea4ab4'),
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => array('Content-Type:application/json'),
             )
         );
-        $result = json_decode(curl_exec($curl),true);
 
-        return $result;
+        return json_decode(curl_exec($curl), true);
     }
 
-    private function usd (): array {
-        $curl = $this->curl();
-        foreach ($curl as $value) {
-            if ($value['ccy'] == 'USD') {
-                $this->USD = $value;
-            }
-        };
-        return $this->USD;
-    }
-
-    private function eur (): array {
-        $curl = $this->curl();
-        foreach ($curl as $value) {
-            if ($value['ccy'] == 'EUR') {
-                $this->EUR = $value;
-            }
-        };
-        return $this->EUR;
-    }
-
-    private function rub (): array {
-        $curl = $this->curl();
-        foreach ($curl as $value) {
-            if ($value['ccy'] == 'RUR') {
-                $this->RUB = $value;
-            }
-        };
-        return $this->RUB;
-    }
-
-    private function btc (): array {
-        $curl = $this->curl();
-        foreach ($curl as $value) {
-            if ($value['ccy'] == 'BTC') {
-                $this->BTC = $value;
-            }
-        };
-        return $this->BTC;
-    }
-
-    public function toDecimal ($from, $to, $amount): float
+    private function exchangeRates()
     {
-        switch ($from) {
-            case "EUR":
-                $eurSale = $this->eur()['sale'];
-                $from_Currency = $eurSale * $amount;
-                break;
-            case "USD":
-                $usdSale = $this->usd()['sale'];
-                $from_Currency = $usdSale * $amount;
-                break;
-            case "RUB":
-                $rubSale = $this->rub()['sale'];
-                $from_Currency = $rubSale * $amount;
-                break;
-            case "UAH":
-                $from_Currency = $amount;
-                break;
-            case "BTC":
-                $btcSale = $this->btc()['sale'];
-                $from_Currency = $btcSale * $amount;
-                break;
+        $exchanges = $this->curl();
+
+        foreach ($exchanges as $key => $value) {
+            if (in_array($this->from, $value) && in_array($this->to, $value)) {
+                $exchange = $value;
+            }
         }
+        return $exchange;
+    }
 
-        switch ($to) {
-            case "EUR":
-                $eurBuy = $this->eur()['buy'];
-                if ($from == 'BTC') {
-                    $usdSale = $this->usd()['sale'];
-                    $uah = $from_Currency * $usdSale;
-
-                    $to_Currency = $uah / $eurBuy;
-                } else {
-                    $to_Currency = $from_Currency / $eurBuy;
-                }
-                break;
-            case "USD":
-                $usdBuy = $this->usd()['buy'];
-                if ($from == 'BTC') {
-                    $to_Currency = $from_Currency;
-                } else {
-                    $to_Currency = $from_Currency / $usdBuy;
-                }
-                break;
-            case "RUB":
-                $rubBuy = $this->rub()['buy'];
-                if ($from == 'BTC') {
-                    $usdSale = $this->usd()['sale'];
-                    $uah = $from_Currency * $usdSale;
-
-                    $to_Currency = $uah / $rubBuy;
-                } else {
-                    $to_Currency = $from_Currency / $rubBuy;
-                }
-                break;
-            case "UAH":
-                if ($from == 'BTC') {
-                    $usdSale = $this->usd()['sale'];
-                    $uah = $from_Currency * $usdSale;
-
-                    $to_Currency = $uah;
-                } else {
-                    $to_Currency = $from_Currency;
-                }
-                break;
-            case "BTC":
-                $btcBuy = $this->btc()['buy'];
-                $to_Currency = $from_Currency / $btcBuy;
-                break;
+    public function toDecimal()
+    {
+        $exchange = $this->exchangeRates();
+        if ($exchange) {
+            if ($this->from == $this->to) {
+                $result = $this->amount;
+            } elseif ($exchange['ccy'] == $this->from) {
+                $result = $exchange['sale'] * $this->amount;
+            } else {
+                $result = $this->amount / $exchange['buy'];
+            }
         }
-        return round($to_Currency, 3);
+        return round($result, 3);
     }
 }

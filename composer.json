@@ -13,11 +13,6 @@
       "Abyzs\\PrivatCoolLib\\": "src/"
     }
   },
-  "autoload-dev": {
-    "psr-4": {
-      "Abyzs\\PrivatCoolLib\\": "tests/"
-    }
-  },
   "require": {
     "ext-curl": "*"
   }
