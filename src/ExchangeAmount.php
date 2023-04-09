@@ -2,51 +2,25 @@
 
 namespace Abyzs\PrivatCoolLib;
 
-
 class ExchangeAmount
 {
-    private $url = 'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5';
-    private $from;
-    private $to;
-    private $amount;
+    private string $from;
+    private string $to;
+    private float $amount;
 
-    public function __construct($from, $to, $amount)
+    public function __construct(string $from,  string $to, float $amount)
     {
         $this->from = $from;
         $this->to = $to;
         $this->amount = $amount;
     }
 
-    private function curl()
+    public function toDecimal(): float
     {
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-                CURLOPT_URL => $this->url,
-                CURLOPT_CUSTOMREQUEST => "GET",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_HTTPHEADER => array('Content-Type:application/json'),
-            )
-        );
+        $exchange = (new ExchangeRate($this->from, $this->to))->get();
+        $result = 0;
 
-        return json_decode(curl_exec($curl), true);
-    }
-
-    private function exchangeRates()
-    {
-        $exchanges = $this->curl();
-
-        foreach ($exchanges as $key => $value) {
-            if (in_array($this->from, $value) && in_array($this->to, $value)) {
-                $exchange = $value;
-            }
-        }
-        return $exchange;
-    }
-
-    public function toDecimal()
-    {
-        $exchange = $this->exchangeRates();
-        if ($exchange) {
+        if (!empty($exchange)) {
             if ($this->from == $this->to) {
                 $result = $this->amount;
             } elseif ($exchange['ccy'] == $this->from) {
