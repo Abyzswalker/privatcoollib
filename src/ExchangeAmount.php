@@ -2,6 +2,9 @@
 
 namespace Abyzs\PrivatCoolLib;
 
+use Abyzs\PrivatCoolLib\Api\PrivatApi;
+use Throwable;
+
 class ExchangeAmount
 {
     private string $from;
@@ -17,18 +20,14 @@ class ExchangeAmount
 
     public function toDecimal(): float
     {
-        $exchange = (new ExchangeRate($this->from, $this->to))->get();
-        $result = 0;
-
-        if (!empty($exchange)) {
+        try {
             if ($this->from == $this->to) {
-                $result = $this->amount;
-            } elseif ($exchange['ccy'] == $this->from) {
-                $result = $exchange['sale'] * $this->amount;
+                return $this->amount;
             } else {
-                $result = $this->amount / $exchange['buy'];
+                return (new ExchangeRate($this->from, $this->to, $this->amount, new PrivatApi()))->get();
             }
+        } catch (Throwable $ex) {
+            echo $ex->getMessage();
         }
-        return round($result, 3);
     }
 }

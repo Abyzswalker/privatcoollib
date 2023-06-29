@@ -7,17 +7,12 @@ use Abyzs\PrivatCoolLib\Api\PrivatUrl;
 
 class PrivatUrlTest extends TestCase
 {
-    private PrivatUrl $url;
-
-    protected function setUp(): void
-    {
-        $this->url = new PrivatUrl();
-    }
-
-    protected function tearDown(): void {}
+    protected function setUp(): void {}
 
     public function testUrl()
     {
-        $this->assertIsString($this->url->get());
+        $privatUrl = new PrivatUrl();
+
+        $this->assertIsString($privatUrl->get());
     }
 }

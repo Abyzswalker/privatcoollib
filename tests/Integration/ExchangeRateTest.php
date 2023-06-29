@@ -4,18 +4,17 @@ namespace Abyzs\PrivatCoolLib\Integration;
 
 use PHPUnit\Framework\TestCase;
 use Abyzs\PrivatCoolLib\ExchangeRate;
+use Abyzs\PrivatCoolLib\Api\PrivatApi;
 
 class ExchangeRateTest extends TestCase
 {
-    private ExchangeRate $exchangeRate;
-
-    protected function setUp(): void
-    {
-        $this->exchangeRate = new ExchangeRate('UAH', 'USD');
-    }
+    protected function setUp(): void {}
 
     public function testGet()
     {
-        $this->assertNotEmpty($this->exchangeRate->get());
+        $privatApi = new PrivatApi();
+        $exchangeRate = new ExchangeRate('UAH', 'USD', 100, $privatApi);
+
+        $this->assertIsFloat($exchangeRate->get());
     }
 }

@@ -7,15 +7,12 @@ use Abyzs\PrivatCoolLib\ExchangeAmount;
 
 class ExchangeAmountTest extends TestCase
 {
-    private ExchangeAmount $exchangeAmount;
-
-    protected function setUp(): void
-    {
-        $this->exchangeAmount = new ExchangeAmount('UAH', 'USD', 1000);
-    }
+    protected function setUp(): void {}
 
     public function testToDecimal()
     {
-        $this->assertIsFloat($this->exchangeAmount->toDecimal());
+        $exchangeAmount = new ExchangeAmount('USD', 'UAH', 100);
+
+        $this->assertIsFloat($exchangeAmount->toDecimal());
     }
 }

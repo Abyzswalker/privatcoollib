@@ -7,15 +7,12 @@ use Abyzs\PrivatCoolLib\Api\PrivatApi;
 
 class PrivatApiTest extends TestCase
 {
-    private PrivatApi $api;
-
-    protected function setUp(): void
-    {
-        $this->api = new PrivatApi();
-    }
+    protected function setUp(): void {}
 
     public function testUrl()
     {
-        $this->assertIsArray($this->api->getData());
+        $privatApi = new PrivatApi();
+
+        $this->assertIsArray($privatApi->getData());
     }
 }
